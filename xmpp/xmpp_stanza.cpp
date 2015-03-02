@@ -124,32 +124,32 @@ void XmlNode::set_attribute(const std::string& name, const std::string& value)
 
 void XmlNode::set_tail(const std::string& data)
 {
-  this->tail = xml_escape(data);
+  this->tail = data;
 }
 
 void XmlNode::add_to_tail(const std::string& data)
 {
-  this->tail += xml_escape(data);
+  this->tail += data;
 }
 
 void XmlNode::set_inner(const std::string& data)
 {
-  this->inner = xml_escape(data);
+  this->inner = data;
 }
 
 void XmlNode::add_to_inner(const std::string& data)
 {
-  this->inner += xml_escape(data);
+  this->inner += data;
 }
 
 std::string XmlNode::get_inner() const
 {
-  return xml_unescape(this->inner);
+  return this->inner;
 }
 
 std::string XmlNode::get_tail() const
 {
-  return xml_unescape(this->tail);
+  return this->tail;
 }
 
 XmlNode* XmlNode::get_child(const std::string& name, const std::string& xmlns) const
