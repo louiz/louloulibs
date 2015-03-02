@@ -1,6 +1,5 @@
 #include <xmpp/adhoc_command.hpp>
-#include <xmpp/biboumi_component.hpp>
-
+#include <xmpp/xmpp_component.hpp>
 #include <utils/reload.hpp>
 
 using namespace std::string_literals;
