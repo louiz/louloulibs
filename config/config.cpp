@@ -5,7 +5,7 @@
 
 #include <stdlib.h>
 
-std::string Config::filename = "./biboumi.cfg";
+std::string Config::filename{};
 bool Config::file_must_exist = false;
 
 std::string Config::get(const std::string& option, const std::string& def)
