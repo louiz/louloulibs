@@ -261,6 +261,7 @@ void XmppComponent::handle_handshake(const Stanza& stanza)
              []() { sd_notify(0, "WATCHDOG=1"); }));
     }
 #endif
+  this->after_handshake();
 }
 
 void XmppComponent::handle_error(const Stanza& stanza)

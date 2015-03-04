@@ -36,7 +36,7 @@ class XmppComponent: public TCPSocketHandler
 {
 public:
   explicit XmppComponent(std::shared_ptr<Poller> poller, const std::string& hostname, const std::string& secret);
-  ~XmppComponent() = default;
+  virtual ~XmppComponent() = default;
 
   void on_connection_failed(const std::string& reason) override final;
   void on_connected() override final;
@@ -197,6 +197,8 @@ public:
 
   void handle_handshake(const Stanza& stanza);
   void handle_error(const Stanza& stanza);
+
+  virtual void after_handshake() {}
 
   /**
    * Whether or not we ever succeeded our authentication to the XMPP server
