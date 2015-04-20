@@ -26,4 +26,13 @@ namespace utils
   std::string convert_to_utf8(const std::string& str, const char* encoding);
 }
 
+namespace xep0106
+{
+  /**
+   * Decode and encode inplace.
+   */
+  void decode(std::string&);
+  void encode(std::string&);
+}
+
 #endif // ENCODING_INCLUDED

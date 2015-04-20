@@ -8,6 +8,7 @@
 #include <string.h>
 #include <iconv.h>
 
+#include <map>
 #include <bitset>
 
 /**
@@ -215,4 +216,39 @@ namespace utils
     return res;
   }
 
+}
+
+namespace xep0106
+{
+  static const std::map<const char, const std::string> encode_map = {
+    {' ', "\\20"},
+    {'"', "\\22"},
+    {'&', "\\26"},
+    {'\'',"\\27"},
+    {'/', "\\2f"},
+    {':', "\\3a"},
+    {'<', "\\3c"},
+    {'>', "\\3e"},
+    {'@', "\\40"},
+  };
+
+  void decode(std::string& s)
+  {
+    std::string::size_type pos;
+    for (const auto& pair: encode_map)
+      while ((pos = s.find(pair.second)) != std::string::npos)
+        s.replace(pos, pair.second.size(),
+                  1, pair.first);
+  }
+
+  void encode(std::string& s)
+  {
+    std::string::size_type pos;
+    while ((pos = s.find_first_of(" \"&'/:<>@")) != std::string::npos)
+      {
+        auto it = encode_map.find(s[pos]);
+        assert(it != encode_map.end());
+        s.replace(pos, 1, it->second);
+      }
+  }
 }
