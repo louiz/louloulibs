@@ -42,7 +42,8 @@ TCPSocketHandler::TCPSocketHandler(std::shared_ptr<Poller> poller):
   connected(false),
   connecting(false)
 #ifdef CARES_FOUND
-  ,resolved(false),
+  ,resolving(false),
+  resolved(false),
   resolved4(false),
   resolved6(false),
   cares_addrinfo(nullptr),
@@ -95,6 +96,7 @@ void TCPSocketHandler::connect(const std::string& address, const std::string& po
           // the addresses have been found and `resolved` has been set to true
           // (but connecting will still be false), TCPSocketHandler::connect()
           // needs to be called, again.
+          this->resolving = true;
           DNSHandler::instance.gethostbyname(address, this, AF_INET6);
           DNSHandler::instance.gethostbyname(address, this, AF_INET);
           return;
@@ -362,7 +364,7 @@ bool TCPSocketHandler::is_connected() const
 bool TCPSocketHandler::is_connecting() const
 {
 #ifdef CARES_FOUND
-  return this->connecting || !this->resolved;
+  return this->connecting || this->resolving;
 #else
   return this->connecting;
 #endif
@@ -481,6 +483,7 @@ void TCPSocketHandler::on_hostname4_resolved(int status, struct hostent* hostent
   if (this->resolved4 && this->resolved6)
     {
       this->resolved = true;
+      this->resolving = false;
       this->connect();
     }
 }
@@ -496,6 +499,7 @@ void TCPSocketHandler::on_hostname6_resolved(int status, struct hostent* hostent
   if (this->resolved4 && this->resolved6)
     {
       this->resolved = true;
+      this->resolving = false;
       this->connect();
     }
 }

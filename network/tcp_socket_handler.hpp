@@ -235,6 +235,7 @@ protected:
   bool connecting;
 
 #ifdef CARES_FOUND
+  bool resolving;
   /**
    * Whether or not the DNS resolution was successfully done
    */
