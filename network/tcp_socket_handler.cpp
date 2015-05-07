@@ -326,6 +326,14 @@ void TCPSocketHandler::close()
     }
   this->connected = false;
   this->connecting = false;
+#ifdef CARES_FOUND
+  this->resolving = false;
+  this->resolved = false;
+  this->resolved4 = false;
+  this->resolved6 = false;
+  this->free_cares_addrinfo();
+  this->cares_error.clear();
+#endif
   this->in_buf.clear();
   this->out_buf.clear();
   this->port.clear();
