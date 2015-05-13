@@ -1,4 +1,5 @@
 #include <xmpp/jid.hpp>
+#include <algorithm>
 #include <cstring>
 #include <map>
 
@@ -66,6 +67,12 @@ std::string jidprep(const std::string& original)
     log_error(error_msg + stringprep_strerror(rc));
     return "";
   }
+  std::replace_if(std::begin(domain), domain + ::strlen(domain),
+                  [](const char c) -> bool
+                  {
+                    return !((c >= 'a' && c <= 'z') || c == '-' ||
+                      (c >= '0' && c <= '9') || c == '.');
+                  }, '-');
 
   // If there is no resource, stop here
   if (jid.resource.empty())
