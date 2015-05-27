@@ -5,6 +5,7 @@
 #include <assert.h>
 #include <errno.h>
 #include <stdio.h>
+#include <signal.h>
 
 #include <cstring>
 #include <iostream>
@@ -137,7 +138,24 @@ int Poller::poll(const std::chrono::milliseconds& timeout)
   if (this->socket_handlers.empty() && timeout == utils::no_timeout)
     return -1;
 #if POLLER == POLL
-  int nb_events = ::poll(this->fds, this->nfds, timeout.count());
+  // Convert our nice timeout into this ugly struct
+  struct timespec timeout_ts;
+  struct timespec* timeout_tsp;
+  if (timeout > 0s)
+    {
+      auto seconds = std::chrono::duration_cast<std::chrono::seconds>(timeout);
+      timeout_ts.tv_sec = seconds.count();
+      timeout_ts.tv_nsec = std::chrono::duration_cast<std::chrono::nanoseconds>(timeout - seconds).count();
+      timeout_tsp = &timeout_ts;
+    }
+  else
+    timeout_tsp = nullptr;
+
+  // Unblock all signals, only during the ppoll call
+  sigset_t empty_signal_set;
+  sigemptyset(&empty_signal_set);
+  int nb_events = ::ppoll(this->fds, this->nfds, timeout_tsp,
+                          &empty_signal_set);
   if (nb_events < 0)
     {
       if (errno == EINTR)
@@ -172,7 +190,11 @@ int Poller::poll(const std::chrono::milliseconds& timeout)
 #elif POLLER == EPOLL
   static const size_t max_events = 12;
   struct epoll_event revents[max_events];
-  const int nb_events = ::epoll_wait(this->epfd, revents, max_events, timeout.count());
+  // Unblock all signals, only during the epoll_pwait call
+  sigset_t empty_signal_set;
+  sigemptyset(&empty_signal_set);
+  const int nb_events = ::epoll_pwait(this->epfd, revents, max_events, timeout.count(),
+                                      &empty_signal_set);
   if (nb_events == -1)
     {
       if (errno == EINTR)
